@@ -5,6 +5,8 @@ const userOtpVerification = require("../models/userOtpVerification");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 
+let mainUserId;
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   auth: {
@@ -47,6 +49,12 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Passwords do not match");
   }
 
+  const userExists = await User.findOne({email})
+    if(userExists){
+        res.status(400)
+        throw new Error('User already exists')
+    }
+
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
   const user = new User({
@@ -55,19 +63,15 @@ const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
     verified: false,
   });
-  user.save();
+
 
   try {
     const result = await sendOTPVerificationEmail(user, res);
-    if (result.status === "Verified") {
+    console.log("Inside register check")
+    console.log(result.statusCode)
+    if (result.statusCode === 200) {
         console.log("user is verified")
       const savedUser = await user.save();
-      res.json({
-        status: "success",
-        message: "User registered successfully",
-        user: savedUser,
-      });
-    
     }
   } catch (error) {
     res.status(500).send({ message: "Error registering user" , error});
@@ -96,8 +100,10 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
     });
     userOtp.save();
     await transporter.sendMail(mailOptions);
+     mainUserId = _id;
 
     return res.json({
+
         status: "success",
         message: "verification otp email sent",
         data:{userId :_id}
@@ -130,7 +136,8 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 
 const sendOtp = async(req, res) =>{
 
-    let {otp, userId} = req.body
+    let {otp} = req.body
+    const userId = mainUserId;
     console.log("body wala otp is ",otp);
     console.log("body wala userId is ",userId);
 
@@ -158,7 +165,7 @@ const sendOtp = async(req, res) =>{
 const verifyOtp = async (  {userId , otp}, req, res) => {
     console.log("INSIDE THE FUNC")
     try {
-    //   let { _id, otp } = req.body;
+
       console.log("user id is", userId);
       console.log("OTP is", otp);
       if (!userId || !otp) {
