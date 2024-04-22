@@ -5,10 +5,6 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add First Name']
     },
-    lName: {
-        type: String,
-        required: [true, 'Please add Last Name']
-    },
     email: {
         type: String,
         required: [true, 'Please add an email']

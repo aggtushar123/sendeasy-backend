@@ -5,21 +5,15 @@ const User = require('../models/userModel')
 const userOtpVerification = require('../models/userOtpVerification')
 
 const registerUser = asyncHandler(async(req,res) => {
-    const { fName, lName, email, password, cPassword } = req.body;
+    const { fName, email, password, cPassword } = req.body;
 
-    if (!fName || !lName || !email || !password || !cPassword) {
-        res.status(400)
-        throw new Error('Please include all fields');
+    if (!fName ||  !email || !password || !cPassword) {
+        res.status(400).json({message:'Please include all fields'});
     } 
         
     if (!/^[a-zA-z ]*$/.test(fName)) {
         res.status(400)
         throw new Error('Invalid First Name entered');
-    }  
-    
-    if (!/^[a-zA-z ]*$/.test(lName)) {
-        res.status(400)
-        throw new Error('Invalid Last Name entered');
     }  
     
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
@@ -50,7 +44,6 @@ const registerUser = asyncHandler(async(req,res) => {
         try {
             const result = await userService.createNewUser({
                 fName,
-                lName,
                 email,
                 password
             })
@@ -64,6 +57,7 @@ const registerUser = asyncHandler(async(req,res) => {
 })
 
 const verifyOtp = async(req, res) =>{
+
         let {userId, otp} = req.body
         if(!userId || !otp){
             throw new ERROR("Empty otp details are not allowed");
@@ -78,6 +72,8 @@ const verifyOtp = async(req, res) =>{
             return res.status(500).send({ message: 'Error Verfying Otp' })
         }
 }
+
+
 
 const resendOtp = async(req,res) => {
     try{
