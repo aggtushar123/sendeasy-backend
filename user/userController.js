@@ -163,7 +163,7 @@ const sendOtp = async(req, res) =>{
     }
 }
 const verifyOtp = async (  {userId , otp}, req, res) => {
-    console.log("INSIDE THE FUNC")
+    // console.log("INSIDE THE FUNC")
     try {
 
       console.log("user id is", userId);
