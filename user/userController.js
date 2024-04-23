@@ -49,11 +49,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Passwords do not match");
   }
 
-  const userExists = await User.findOne({email})
-    if(userExists){
-        res.status(400)
-        throw new Error('User already exists')
-    }
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -63,30 +63,61 @@ const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
     verified: false,
   });
-
-
+  //   const userData = await userOtpVerifiation.findOne({ email });
+  //   const { userId } = userData;
   try {
     const result = await sendOTPVerificationEmail(user, res);
-    console.log("Inside register check")
-    console.log(result.statusCode)
+    const userId = mainUserId.toString();
+
+    setTimeout(async () => {
+        const finalUserId = await User.findById(userId)
+        console.log(finalUserId);
+      if (finalUserId.verified === false) {
+
+        console.log("Deleting");
+        await User.findByIdAndDelete(userId);
+        
+      }
+    }, 25000);
+    console.log("Inside register check");
+    console.log(result.statusCode);
     if (result.statusCode === 200) {
-        console.log("user is verified")
+      console.log("OTP Sent");
       const savedUser = await user.save();
     }
   } catch (error) {
-    res.status(500).send({ message: "Error registering user" , error});
+    res.status(500).send({ message: "Error registering user", error });
   }
 });
 
+const getUser = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      console.log("user id when getting user api ", userId);
 
- 
+      const user = await User.findById(userId);
+      if (user) {
+        res.status(200).json({ exists: true, user });
+      } else {
+        // User does not exist
+        res.status(200).json({ exists: false });
+      }
+    } catch (error) {
+      // Handle errors
+      console.error('Error checking user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
+
 const sendOTPVerificationEmail = async ({ _id, email }, res) => {
   try {
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
     const mailOptions = {
       from: "sendalong93@gmail.com",
       to: email,
-      subjet: "Verify your Email",
+      subject: "Verify your Email",
       html: `<p> Enter <b>${otp}</b> in the app to verify your email and complete the signup</p><p>This code <b>expires in 1 hour</b>.</p>`,
     };
     const salt = await bcrypt.genSalt(10);
@@ -96,37 +127,18 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
       userId: _id,
       otp: hashedOTP,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 360000,
+      expiresAt: Date.now() + 3600000,
     });
-    userOtp.save();
+    await userOtp.save();
     await transporter.sendMail(mailOptions);
-     mainUserId = _id;
+    mainUserId = _id;
 
     return res.json({
-
-        status: "success",
-        message: "verification otp email sent",
-        data:{userId :_id}
-    })
-
-    // const verifyResult = await verifyOtp();
-    // if (verifyResult.status === "Verified") {
-    //     console.log("otp IS VERIFIED")
-    //   const savedUser = await User.findByIdAndUpdate(_id, { verified: true }, { new: true });
-    //   return res.json({
-    //     status: "success",
-    //     message: "User Email verified successfully",
-    //     user: savedUser,
-    //   });
-    // } else{
-        
-    //   return res.status(400).json({
-    //     status: "failed",
-    //     message: "Email verification failed",
-    //   });
-    } 
-    
-  catch (error) {
+      status: "success",
+      message: "verification otp email sent",
+      data: { userId: _id},
+    });
+  } catch (error) {
     res.json({
       status: "failed",
       message: error.message,
@@ -134,94 +146,90 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
   }
 };
 
-const sendOtp = async(req, res) =>{
+const sendOtp = async (req, res) => {
+  let { otp } = req.body;
+  const userId = mainUserId;
+  console.log("body wala otp is ", otp);
+  console.log("body wala userId is ", userId);
 
-    let {otp} = req.body
-    const userId = mainUserId;
-    console.log("body wala otp is ",otp);
-    console.log("body wala userId is ",userId);
+  if (!otp) {
+    throw new ERROR("Empty otp details are not allowed");
+  }
 
-    if(!otp){
-        throw new ERROR("Empty otp details are not allowed");
-    }
-    const verifyResult = await verifyOtp({otp,userId});
-    if (verifyResult.status === "Verified") {
-        console.log("otp IS VERIFIED")
-      const savedUser = await User.findByIdAndUpdate(userId, { verified: true }, { new: true });
-      return res.json({
-        status: "success",
-        message: "User Email verified successfully",
-        user: savedUser,
+  const verifyResult = await verifyOtp({ otp, userId });
+  if (verifyResult.status === "Verified") {
+    console.log("OTP is verified");
+    // clearTimeout(verifyTimeout);
+    const savedUser = await User.findByIdAndUpdate(
+      userId,
+      { verified: true },
+      { new: true }
+    );
+    return res.json({
+      status: "success",
+      message: "User Email verified successfully",
+      user: savedUser,
+    });
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "Email verification failed",
+    });
+  }
+};
+const verifyOtp = async ({ userId, otp }, req, res) => {
+  // console.log("INSIDE THE FUNC")
+  try {
+    console.log("user id is", userId);
+    console.log("OTP is", otp);
+    if (!userId || !otp) {
+      throw new ERROR("Empty otp details are not allowed");
+      return;
+    } else {
+      const userOtpVerificationRecords = await userOtpVerification.find({
+        userId,
       });
-    } else{
-        
-      return res.status(400).json({
-        status: "failed",
-        message: "Email verification failed",
-      });
-    
-    }
-}
-const verifyOtp = async (  {userId , otp}, req, res) => {
-    // console.log("INSIDE THE FUNC")
-    try {
-
-      console.log("user id is", userId);
-      console.log("OTP is", otp);
-      if (!userId || !otp) {
-        throw new ERROR("Empty otp details are not allowed");
+      if (!userOtpVerificationRecords) {
+        throw new ERROR(
+          "Account record doesn't exist or has been verified already. Please sign up or log in"
+        );
         return;
-      } 
-      
-      else {
-        const userOtpVerificationRecords = await userOtpVerification.find({
-          userId,
-        });
-        if (!userOtpVerificationRecords) {
-          throw new ERROR(
-            "Account record doesn't exist or has been verified already. Please sign up or log in"
-          );
-          return;
-        } 
-        
-        else {
-          const { expiresAt } = userOtpVerificationRecords[0];
-          const hashedOTP = userOtpVerificationRecords[0].otp;
-            console.log("Expires at", expiresAt);
-            console.log("Hashed OTP", hashedOTP);
-          if (expiresAt < Date.now()) {
-            await userOtpVerification.deleteMany({ userId });   
-            throw new Error("Code has expired. Please request again.");
-
-          } 
-          
-          else {
-            const validOTP = await bcrypt.compare(otp, hashedOTP);
-            console.log("valid otp is ", validOTP);
-            if (!validOTP) {
+      } else {
+        const { expiresAt } = userOtpVerificationRecords[0];
+        const hashedOTP = userOtpVerificationRecords[0].otp;
+        console.log("Expires at", expiresAt);
+        console.log("Hashed OTP", hashedOTP);
+        if (expiresAt < Date.now()) {
+          await userOtpVerification.deleteMany({ userId });
+          throw new Error("Code has expired. Please request again.");
+        } else {
+          const validOTP = await bcrypt.compare(otp, hashedOTP);
+          console.log("valid otp is ", validOTP);
+          if (!validOTP) {
             //   throw new Error("Invalid code Passed. Check your inbox.");
-              return { status: "Invalid", message: "Invalid code Passed. Check your inbox." };
-            }
-            
-            else {
-                console.log("IN THE FINAL ELSE");
-              await User.updateOne({ _id: userId }, { verified: true });
-              await userOtpVerification.deleteMany({ userId });
-              return { status: "Verified", message: "User Email verified successfully" };
-            }
+            return {
+              status: "Invalid",
+              message: "Invalid code Passed. Check your inbox.",
+            };
+          } else {
+            console.log("IN THE FINAL ELSE");
+            await User.updateOne({ _id: userId }, { verified: true });
+            await userOtpVerification.deleteMany({ userId });
+            return {
+              status: "Verified",
+              message: "User Email verified successfully",
+            };
           }
         }
       }
-    } catch (error) {
-      return res.json({
-        status: "Failed",
-        message: error.message,
-      });
     }
-  };
-
-  
-
+  } catch (error) {
+    return res.json({
+      status: "Failed",
+      message: error.message,
+    });
+  }
+};
 
 const resendOtp = async (req, res) => {
   try {
@@ -262,6 +270,7 @@ const loginUser = asyncHandler(async (req, res) => {
       fName: user.fName,
       email: user.email,
       token: generateToken(user._id),
+      verified: user.verified,
     });
   } else {
     res.status(401);
@@ -280,5 +289,7 @@ module.exports = {
   loginUser,
   verifyOtp,
   resendOtp,
-  sendOtp
+  sendOtp,
+
+  getUser
 };

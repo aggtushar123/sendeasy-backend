@@ -1,12 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const {registerUser, loginUser, verifyOtp, resendOtp, sendOtp} = require('./userController')
+const {registerUser, loginUser, verifyOtp, resendOtp, sendOtp, getUser} = require('./userController')
 
 router.post('/signup', registerUser)
 router.post('/verifyOTP', verifyOtp)
 router.post('/login', loginUser)
 router.post('/resendOtpVerificationCode', resendOtp)
 router.post('/sendOtp', sendOtp)
+router.get('/user/:userId', getUser);
+
 // router.get('/me', getMe)
 
 module.exports = router
