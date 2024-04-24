@@ -71,7 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     setTimeout(async () => {
         const finalUserId = await User.findById(userId)
-        console.log(finalUserId);
+        // console.log(finalUserId);
       if (finalUserId.verified === false) {
 
         console.log("Deleting");
@@ -147,7 +147,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 };
 
 const sendOtp = async (req, res) => {
-  let { otp } = req.body;
+    const otp = Object.keys(req.body)[0];
   const userId = mainUserId;
   console.log("body wala otp is ", otp);
   console.log("body wala userId is ", userId);
