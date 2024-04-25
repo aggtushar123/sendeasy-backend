@@ -16,16 +16,20 @@ router.post('/login', loginUser);
 router.post('/resendOtpVerificationCode', resendOtp);
 router.post('/sendOtp', sendOtp);
 router.get('/user/:userId', getUser);
-
+router.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    successRedirect: process.env.CLIENT_URL,
+    successRedirect: 'http://localhost:3000/',
     failureRedirect: '/login/failed',
   })
 );
 
 router.get('/login/success', (req, res) => {
+  console.log(req);
   if (req.user) {
     res.status(200).json({
       error: false,
@@ -43,9 +47,6 @@ router.get('/login/failed', (req, res) => {
     message: 'Log in failure',
   });
 });
-
-router.get('/google', passport.authenticate('google', ['profile', 'email']));
-// router.get('/me', getMe)
 
 router.get('logout', (req, res) => {
   req.logOut();

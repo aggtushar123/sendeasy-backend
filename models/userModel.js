@@ -11,7 +11,7 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please add a Password']
+        // required: [true, 'Please add a Password']
     },
     verified:{
         type: Boolean,
