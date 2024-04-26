@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const app = require('../app');
+
 const passport = require('passport');
 const {
   registerUser,
@@ -17,7 +19,7 @@ router.post('/resendOtpVerificationCode', resendOtp);
 router.post('/sendOtp', sendOtp);
 router.get('/user/:userId', getUser);
 router.get(
-  '/auth/google',
+  '/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 router.get(
@@ -29,12 +31,19 @@ router.get(
 );
 
 router.get('/login/success', (req, res) => {
-  console.log(req);
+  // console.log(req);
   if (req.user) {
+    const user = {
+      googleId: req.user.id,
+      email: req.user.email,
+      fName: req.user.displayName,
+      verified: true,
+      isAdmin: false,
+    };
     res.status(200).json({
       error: false,
       message: 'Successfully logged in',
-      user: req.user,
+      user: user,
     });
   } else {
     res.status(403).json({ error: true, message: 'Not authorized' });

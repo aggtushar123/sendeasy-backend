@@ -24,7 +24,7 @@ passport.use(
     async function (accessToken, refreshToken, profile, callback) {
       callback(null, profile);
 
-      console.log(profile);
+      //   console.log(profile);
       try {
         const { email } = profile;
         const userExists = await User.findOne({ email });
