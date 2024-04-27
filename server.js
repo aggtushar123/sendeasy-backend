@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 const connectDB = require('./config/db');
 const cors = require('cors');
 const passportSetup = require('./passport');
-const authRoutes = require('./user/userRoutes');
+const authRoutes = require('./user/googleAuth');
 
 //Connect to Database
 connectDB();

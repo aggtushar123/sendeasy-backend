@@ -23,6 +23,7 @@
     "nodemailer": "^6.9.12",
     "nodemon": "^3.1.0",
     "passport": "0.5",
+    "passport-facebook": "^3.0.0",
     "passport-google-oauth2": "^0.2.0"
   }
 }
