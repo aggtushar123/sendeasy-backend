@@ -9,6 +9,7 @@ const createNewUser = async (profile) => {
     fName: profile.displayName,
     verified: true,
     isAdmin: false,
+    profilePicture: profile.picture,
   });
   const createdUser = await user.save();
   return createdUser;
