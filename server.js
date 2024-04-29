@@ -7,7 +7,8 @@ const PORT = process.env.PORT || 5000;
 const connectDB = require('./config/db');
 const cors = require('cors');
 const passportSetup = require('./passport');
-const authRoutes = require('./user/googleAuth');
+const GoogleAuthRoutes = require('./user/googleAuth');
+const FacebookAuthRoutes = require('./user/FacebookAuth');
 
 //Connect to Database
 connectDB();
@@ -38,5 +39,7 @@ app.use(
   })
 );
 
-app.use('/auth', authRoutes);
+app.use('/auth', GoogleAuthRoutes);
+app.use('/authFacebook', FacebookAuthRoutes);
+
 app.listen(PORT, () => console.log(`Server sarted on port ${PORT}`));

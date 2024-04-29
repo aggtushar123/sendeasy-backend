@@ -19,5 +19,4 @@ router.post('/resendOtpVerificationCode', resendOtp);
 router.post('/sendOtp', sendOtp);
 router.get('/user/:userId', getUser);
 
-
 module.exports = router;
