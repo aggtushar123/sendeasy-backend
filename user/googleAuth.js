@@ -16,14 +16,15 @@ router.get(
 );
 
 router.get('/login/success', (req, res) => {
-  // console.log(req);
   if (req.user) {
+    console.log(req.user);
     const user = {
       googleId: req.user.id,
       email: req.user.email,
       fName: req.user.displayName,
       verified: true,
       isAdmin: false,
+      profilePicture: req.user.picture,
     };
     res.status(200).json({
       error: false,
