@@ -5,6 +5,17 @@ const LuggageListing = require("../models/luggageListing");
 // Get TravelerListings
 // Get /api/travelerListing
 // @access PRIVATE
+
+const getAllLuggageListings = asyncHandler(async (req, res) => {
+    try {
+        const data = await LuggageListing.find();
+        res.json(data);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+      }
+  });
+
 const getLuggageListings = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -144,6 +155,7 @@ const updateLuggageListing = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+    getAllLuggageListings,
   getLuggageListings,
   getLuggageListing,
   createLuggageListing,

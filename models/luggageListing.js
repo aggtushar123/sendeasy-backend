@@ -50,7 +50,7 @@ const luggageListingSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add Location']
     }, 
-    note: {
+   M: {
         type: String,
        
     }, 
