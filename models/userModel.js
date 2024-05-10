@@ -14,6 +14,21 @@ const userSchema = mongoose.Schema(
       type: String,
       // required: [true, 'Please add a Password']
     },
+    mobile: {
+      type: String,
+    },
+    facebook: {
+      type: String,
+      default: "",
+    },
+    linkedin: {
+      type: String,
+      default: "",
+    },
+    instagram: {
+      type: String,
+      default: "",
+    },
     verified: {
       type: Boolean,
       required: [true, 'Please verify using OTP'],
