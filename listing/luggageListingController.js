@@ -154,6 +154,33 @@ const updateLuggageListing = asyncHandler(async (req, res) => {
   res.status(200).json(updatedLuggageListing);
 });
 
+const updateLuggageTripsStatus = asyncHandler(async (req, res) => {
+  const { trips } = req.body;
+  console.log(trips);
+  if (!trips) {
+    return res.status(400).json({ message: "Please provide trips status" });
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(401).json({ message: "User not found" });
+  }
+
+  const luggageListing = await LuggageListing.findById(req.params.id);
+  if (!luggageListing) {
+    return res.status(404).json({ message: "luggage Listing not Found" });
+  }
+
+  if (luggageListing.user.toString() !== req.user.id) {
+    return res.status(401).json({ message: "Not Authorized" });
+  }
+
+  luggageListing.trips = trips;
+  await luggageListing.save();
+
+  res.status(200).json(luggageListing);
+});
+
 module.exports = {
     getAllLuggageListings,
   getLuggageListings,
@@ -161,4 +188,5 @@ module.exports = {
   createLuggageListing,
   updateLuggageListing,
   deleteLuggageListing,
+  updateLuggageTripsStatus,
 };

@@ -44,6 +44,12 @@ const travelerListingSchema = mongoose.Schema({
         type: String,
         required: [false, 'Please add items you will not carry']
     }, 
+    trips:{
+        type: String,
+        required: [true,'Trip type'],
+        enum: ['ongoing', 'cancelled', 'finished'],
+        default: 'ongoing',
+    },
 },
 {
     timestamps: true,

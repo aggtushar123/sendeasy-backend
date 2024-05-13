@@ -50,9 +50,14 @@ const luggageListingSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add Location']
     }, 
-   M: {
+    Note: {
         type: String,
-       
+    },
+    trips:{
+        type: String,
+        required: [true,'Trip type'],
+        enum: ['ongoing', 'cancelled', 'finished'],
+        default: 'ongoing',
     }, 
 },
 {

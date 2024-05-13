@@ -6,14 +6,14 @@ const TravelerListing = require("../models/travelerListing");
 // Get /api/travelerListing
 // @access PRIVATE
 const getAllTravelerListings = asyncHandler(async (req, res) => {
-    try {
-        const data = await TravelerListing.find();
-        res.json(data);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-      }
-  });
+  try {
+    const data = await TravelerListing.find();
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 const getTravelerListings = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
@@ -142,11 +142,39 @@ const updateTravelerListing = asyncHandler(async (req, res) => {
   res.status(200).json(updatedTravelerListing);
 });
 
+const updateTravelerTripsStatus = asyncHandler(async (req, res) => {
+  const { trips } = req.body;
+
+  if (!trips) {
+    return res.status(400).json({ message: "Please provide trips status" });
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(401).json({ message: "User not found" });
+  }
+
+  const travelerListing = await TravelerListing.findById(req.params.id);
+  if (!travelerListing) {
+    return res.status(404).json({ message: "Traveler Listing not Found" });
+  }
+
+  if (travelerListing.user.toString() !== req.user.id) {
+    return res.status(401).json({ message: "Not Authorized" });
+  }
+
+  travelerListing.trips = trips;
+  await travelerListing.save();
+
+  res.status(200).json(travelerListing);
+});
+
 module.exports = {
-    getAllTravelerListings,
+  getAllTravelerListings,
   getTravelerListings,
   getTravelerListing,
   createTravelerListing,
   updateTravelerListing,
   deleteTravelerListing,
+  updateTravelerTripsStatus,
 };
