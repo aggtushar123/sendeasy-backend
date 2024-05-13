@@ -111,15 +111,20 @@ const getUser = async (req, res) => {
   const updateUser = async (req, res) => {
     const userId = req.params.userId;
     const updates = req.body;
+    const token = req.body.token;
+   
   
     try {
-      const user = await User.findByIdAndUpdate(userId, updates, { new: true });
-  
+      const user = await User.findByIdAndUpdate(userId, updates);
+      if (token) {
+        user.token = token;
+        await user.save();
+    }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
   
-      return res.status(200).json({ message: "User updated successfully", user });
+      return res.status(200).json( user );
     } catch (error) {
       return res.status(500).json({ error: "Internal server error" });
     }
@@ -286,6 +291,18 @@ const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
       token: generateToken(user._id),
       verified: user.verified,
+      mobile: user.mobile,
+      kycDocument: user.kycDocument,
+      description: user.description,
+      dob: user.dob,
+      gender: user.gender,
+      occupation: user.occupation,
+      workplace: user.workplace,
+      workplaceEmail: user.workplaceEmail,
+      address: user.address,
+      linkedin: user.linkedin,
+      facebook: user.facebook,
+      instagram: user.instagram,
     });
   } else {
     res.status(401);

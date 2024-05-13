@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema(
   {
     fName: {
       type: String,
-      required: [true, 'Please add First Name'],
+      required: [true, "Please add First Name"],
     },
     email: {
       type: String,
-      required: [true, 'Please add an email'],
+      required: [true, "Please add an email"],
     },
     password: {
       type: String,
@@ -16,6 +16,40 @@ const userSchema = mongoose.Schema(
     },
     mobile: {
       type: String,
+      default: "",
+    },
+
+    kycDocument: {
+      type: String,
+      default: "",
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    dob: {
+      type: String,
+      default: "",
+    },
+    gender: {
+      type: String,
+      default: "",
+    },
+    occupation: {
+      type: String,
+      default: "",
+    },
+    workplace: {
+      type: String,
+      default: "",
+    },
+    workplaceEmail: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
     },
     facebook: {
       type: String,
@@ -31,7 +65,7 @@ const userSchema = mongoose.Schema(
     },
     verified: {
       type: Boolean,
-      required: [true, 'Please verify using OTP'],
+      required: [true, "Please verify using OTP"],
       default: false,
     },
     isAdmin: {
@@ -43,10 +77,13 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    token: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
