@@ -23,7 +23,7 @@ const travelerListingSchema = mongoose.Schema({
         type: Date,
         required: [true, 'Please enter Date of Travel'],
     },
-    expectaion: {
+    expectation: {
         type: Number,
         required: true,
     },
