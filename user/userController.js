@@ -70,13 +70,11 @@ const registerUser = asyncHandler(async (req, res) => {
     const userId = mainUserId.toString();
 
     setTimeout(async () => {
-        const finalUserId = await User.findById(userId)
-        // console.log(finalUserId);
+      const finalUserId = await User.findById(userId);
+      // console.log(finalUserId);
       if (finalUserId.verified === false) {
-
         console.log("Deleting");
         await User.findByIdAndDelete(userId);
-        
       }
     }, 25000);
     console.log("Inside register check");
@@ -89,9 +87,6 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(500).send({ message: "Error registering user", error });
   }
 });
-
-
-
 
 const sendOTPVerificationEmail = async ({ _id, email }, res) => {
   try {
@@ -118,7 +113,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
     return res.json({
       status: "success",
       message: "verification otp email sent",
-      data: { userId: _id},
+      data: { userId: _id },
     });
   } catch (error) {
     res.json({
@@ -129,9 +124,8 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 };
 
 const sendOtp = async (req, res) => {
-    const otp = Object.keys(req.body)[0];
+  const otp = Object.keys(req.body)[0];
   const userId = mainUserId;
-
 
   if (!otp) {
     throw new ERROR("Empty otp details are not allowed");
@@ -139,17 +133,14 @@ const sendOtp = async (req, res) => {
 
   const verifyResult = await verifyOtp({ otp, userId });
   if (verifyResult.status === "Verified") {
-   
     // clearTimeout(verifyTimeout);
     const savedUser = await User.findByIdAndUpdate(
       userId,
-     
+
       { verified: true },
       { new: true }
     );
     return res.json({
-      status: "success",
-      message: "User Email verified successfully",
       user: savedUser,
     });
   } else {
@@ -160,7 +151,6 @@ const sendOtp = async (req, res) => {
   }
 };
 const verifyOtp = async ({ userId, otp }, req, res) => {
- 
   try {
     if (!userId || !otp) {
       throw new ERROR("Empty otp details are not allowed");
@@ -177,13 +167,13 @@ const verifyOtp = async ({ userId, otp }, req, res) => {
       } else {
         const { expiresAt } = userOtpVerificationRecords[0];
         const hashedOTP = userOtpVerificationRecords[0].otp;
-      
+
         if (expiresAt < Date.now()) {
           await userOtpVerification.deleteMany({ userId });
           throw new Error("Code has expired. Please request again.");
         } else {
           const validOTP = await bcrypt.compare(otp, hashedOTP);
-      
+
           if (!validOTP) {
             //   throw new Error("Invalid code Passed. Check your inbox.");
             return {
@@ -192,7 +182,11 @@ const verifyOtp = async ({ userId, otp }, req, res) => {
             };
           } else {
             console.log("IN THE FINAL ELSE");
-            await User.updateOne({ _id: userId },  {token: generateToken(userId)}, { verified: true });
+            await User.updateOne(
+              { _id: userId },
+              { token: generateToken(userId) },
+              { verified: true }
+            );
             await userOtpVerification.deleteMany({ userId });
             return {
               status: "Verified",
@@ -231,38 +225,36 @@ const resendOtp = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("user id when getting user api ", userId);
 
     const user = await User.findById(userId);
     if (user) {
-      res.status(200).json({ exists: true, user });
+      res.status(200).json( user );
     } else {
       // User does not exist
       res.status(200).json({ exists: false });
     }
   } catch (error) {
     // Handle errors
-    console.error('Error checking user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error checking user:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 const updateUser = async (req, res) => {
   const userId = req.params.userId;
   const updates = req.body;
   const token = req.body.token;
- 
 
   try {
     const user = await User.findByIdAndUpdate(userId, updates);
     if (token) {
       user.token = token;
       await user.save();
-  }
+    }
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    return res.status(200).json( user );
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -282,7 +274,6 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   if (user && (await bcrypt.compare(password, user.password))) {
-    
     res.status(200).json({
       _id: user.id,
       fName: user.fName,
@@ -314,8 +305,6 @@ const generateToken = (id) => {
   });
 };
 
-
-
 module.exports = {
   registerUser,
   loginUser,
@@ -323,5 +312,5 @@ module.exports = {
   resendOtp,
   sendOtp,
   updateUser,
-  getUser
+  getUser,
 };
