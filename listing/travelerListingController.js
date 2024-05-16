@@ -55,7 +55,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     destinationLocation,
     luggageSpace,
     date,
-    expectaion,
+    expectation,
     timeOfDelivery,
     sourceLocation,
     departure,
@@ -65,7 +65,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     !destinationLocation ||
     !luggageSpace ||
     !date ||
-    !expectaion ||
+    !expectation ||
     !timeOfDelivery ||
     !sourceLocation ||
     !departure
@@ -84,7 +84,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     destinationLocation,
     luggageSpace,
     date,
-    expectaion,
+    expectation,
     timeOfDelivery,
     sourceLocation,
     departure,

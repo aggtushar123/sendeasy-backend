@@ -1,19 +1,7 @@
 const GoogleStratergy = require('passport-google-oauth2').Strategy;
 const FacebookStratergy = require('passport-facebook').Strategy;
 const passport = require('passport');
-const User = require('./models/userModel');
-const createNewUser = async (profile) => {
-  const user = await new User({
-    googleId: profile.id,
-    email: profile.email,
-    fName: profile.displayName,
-    verified: true,
-    isAdmin: false,
-    profilePicture: profile.picture,
-  });
-  const createdUser = await user.save();
-  return createdUser;
-};
+
 
 passport.use(
   new GoogleStratergy(
@@ -26,18 +14,6 @@ passport.use(
     async function (accessToken, refreshToken, profile, callback) {
       callback(null, profile);
 
-      //   console.log(profile);
-      try {
-        const { email } = profile;
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-          throw new Error();
-        } else {
-          createNewUser(profile);
-        }
-      } catch (error) {
-        console.log('user already exists', error);
-      }
     }
   )
 );
