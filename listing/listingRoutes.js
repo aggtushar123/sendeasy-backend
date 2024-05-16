@@ -7,7 +7,7 @@ const {protect} = require('../middleware/authMiddleware')
 router.route('/travelerlisting').get(protect, getTravelerListings).post(protect, createTravelerListing)
 router.route('/travelerlisting/getall').get(getAllTravelerListings)
 router.route('/travelerlisting/:id').get(protect, getTravelerListing).delete(protect, deleteTravelerListing).put(protect, updateTravelerListing)
-router.put('/travelerlisting/:id/updatetrips', protect, updateTravelerTripsStatus);
+router.put('/travelerlisting/:id/updatetripstatus', protect, updateTravelerTripsStatus);
 
 router.route('/luggagelisting').get(protect, getLuggageListings).post(protect, createLuggageListing)
 router.route('/luggagelisting/getall').get(getAllLuggageListings)
