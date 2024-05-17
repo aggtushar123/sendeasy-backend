@@ -298,7 +298,21 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Password");
   }
 });
+const deleteUser = async (req, res) => {
+  const userId = req.params.userId;
 
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -313,4 +327,5 @@ module.exports = {
   sendOtp,
   updateUser,
   getUser,
+  deleteUser
 };
