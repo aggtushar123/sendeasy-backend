@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 //Routes
 app.use('/api/users', require('./user/userRoutes'));
 app.use('/api/listing', require('./listing/listingRoutes'));
+app.use('/api/chats', require('./chat/chatRoutes'))
 app.use(errorHandler);
 app.use(
   cookieSession({
