@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-
+const LuggageListing = require('./luggageListing');
+const TravelerListing = require('./travelerListing');
 const userSchema = mongoose.Schema(
   {
     fName: {
@@ -86,5 +87,21 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+userSchema.pre('remove', async function(next) {
+  try {
+    await LuggageListing.deleteMany({ user: this._id });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+userSchema.pre('remove', async function(next) {
+  try {
+    await TravelerListing.deleteMany({ user: this._id });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = mongoose.model("User", userSchema);

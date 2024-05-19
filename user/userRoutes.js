@@ -10,7 +10,8 @@ const {
   resendOtp,
   sendOtp,
   getUser,
-  updateUser
+  updateUser,
+  deleteUser
 } = require('./userController');
 
 router.post('/signup', registerUser);
@@ -20,5 +21,6 @@ router.post('/resendOtpVerificationCode', resendOtp);
 router.post('/sendOtp', sendOtp);
 router.get('/user/:userId', getUser)
 router.put('/user/:userId', updateUser)
+router.delete('/user/:userId', deleteUser)
 
 module.exports = router;

@@ -47,8 +47,8 @@ const travelerListingSchema = mongoose.Schema({
     trips:{
         type: String,
         required: [true,'Trip type'],
-        enum: ['ongoing', 'cancelled', 'finished'],
-        default: 'ongoing',
+        enum: ['created', 'ongoing', 'cancelled', 'finished'],
+        default: 'created',
     },
 },
 {

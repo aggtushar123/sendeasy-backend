@@ -12,5 +12,5 @@ router.put('/travelerlisting/:id/updatetripstatus', protect, updateTravelerTrips
 router.route('/luggagelisting').get(protect, getLuggageListings).post(protect, createLuggageListing)
 router.route('/luggagelisting/getall').get(getAllLuggageListings)
 router.route('/luggagelisting/:id').get(protect, getLuggageListing).delete(protect, deleteLuggageListing).put(protect, updateLuggageListing)
-router.put('/luggagelisting/:id/updatetrips', protect, updateLuggageTripsStatus);
+router.put('/luggagelisting/:id/updatetripstatus', protect, updateLuggageTripsStatus);
 module.exports = router
