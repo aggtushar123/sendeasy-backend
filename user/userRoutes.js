@@ -11,9 +11,10 @@ const {
   sendOtp,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAllUsers
 } = require('./userController');
-
+const {protect} = require('../middleware/authMiddleware')
 router.post('/signup', registerUser);
 router.post('/verifyOTP', verifyOtp);
 router.post('/login', loginUser);
@@ -22,5 +23,6 @@ router.post('/sendOtp', sendOtp);
 router.get('/user/:userId', getUser)
 router.put('/user/:userId', updateUser)
 router.delete('/user/:userId', deleteUser)
+router.route('/searchuser').get(protect, getAllUsers)
 
 module.exports = router;

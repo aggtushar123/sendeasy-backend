@@ -239,6 +239,21 @@ const getUser = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+const getAllUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  res.send(users);
+});
+
+  
 const updateUser = async (req, res) => {
   const userId = req.params.userId;
   const updates = req.body;
@@ -327,5 +342,6 @@ module.exports = {
   sendOtp,
   updateUser,
   getUser,
-  deleteUser
+  deleteUser,
+  getAllUsers
 };
