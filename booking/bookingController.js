@@ -1,6 +1,7 @@
+const asyncHandler = require("express-async-handler");
 const bookingModel = require('../models/bookingModel');
 
-const getBookingById = () => async (req, res) => {
+const getBookingById = asyncHandler(async (req, res) => {
   try {
     const bookingId = req.params.id;
     const booking = await bookingModel.findById(bookingId);
@@ -11,12 +12,15 @@ const getBookingById = () => async (req, res) => {
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
-};
+  
+}) 
 
-const acceptBooking =  () =>async (req, res) => {
+
+const acceptBooking =  asyncHandler(async (req, res) => {
   try {
     const bookingId = req.params.id;
     const booking = await bookingModel.findById(bookingId);
+
     if (!booking) {
       return res.status(404).send({ message: 'Booking not found' });
     }
@@ -26,7 +30,9 @@ const acceptBooking =  () =>async (req, res) => {
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
-};
+})
+
+
 
 module.exports ={
     getBookingById,

@@ -22,7 +22,7 @@ app.use("/api/users", require("./user/userRoutes"));
 app.use("/api/listing", require("./listing/listingRoutes"));
 app.use("/api/chats", require("./chat/chatRoutes"));
 app.use("/api/message", require("./message/messageRoutes"));
-app.use('/api/booking', require("./booking/bookingRoutes"));
+app.use("/api/booking", require("./booking/bookingRoutes"));
 app.use(errorHandler);
 app.use(
   cookieSession({

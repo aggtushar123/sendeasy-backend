@@ -344,7 +344,7 @@ const getAllNotifications = async (req, res) => {
     }
     
     const user = await User.findOne({ _id: userId });
-    console.log(user)
+   
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -420,11 +420,16 @@ const bookNowTraveler = async (req, res) => {
 
     // Find the user associated with the listedId
     const user = await User.findOne({ _id: listedId });
+    const user2 = await User.findOne({_id: userId})
+ 
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    if (!user2) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
     // Add a notification to the user
     if (!user.notification) {
       user.notification = [];
@@ -436,14 +441,26 @@ const bookNowTraveler = async (req, res) => {
       bookingId: newBooking._id
     });
 
+    if (!user2.notification) {
+      user2.notification = [];
+    }
+
+    user2.notification.push({
+      from: user.fName,
+      message: `Booking Request sent to ${user.fName} `,
+      bookingId: newBooking._id
+    });
+
     // Save the updated user object
     const updatedUser = await user.save();
+    const updatedUser2 = await user2.save();
 
     // Send success response
     res.status(200).json({
       success: true,
       message: "Appointment Booked successfully",
-      user: updatedUser
+      user: updatedUser,
+      user2: updatedUser2
     });
   } catch (error) {
     console.error(error);
