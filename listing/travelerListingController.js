@@ -59,6 +59,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     timeOfDelivery,
     sourceLocation,
     departure,
+    type,
   } = req.body;
   if (
     !travelType ||
@@ -88,6 +89,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     timeOfDelivery,
     sourceLocation,
     departure,
+    type,
     user: req.user.id,
   });
 

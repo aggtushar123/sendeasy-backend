@@ -64,6 +64,7 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverNumber,
     receiverLocation,
     note,
+    type
   } = req.body;
   if (
     !travelType ||
@@ -100,6 +101,7 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverNumber,
     receiverLocation,
     note,
+    type,
     user: req.user.id,
   });
 
