@@ -50,6 +50,10 @@ const travelerListingSchema = mongoose.Schema({
         enum: ['created', 'ongoing', 'cancelled', 'finished'],
         default: 'created',
     },
+    type:{
+        type: String,
+       
+    } 
 },
 {
     timestamps: true,

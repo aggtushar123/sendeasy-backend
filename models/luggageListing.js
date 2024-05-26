@@ -58,7 +58,11 @@ const luggageListingSchema = mongoose.Schema({
         required: [true,'Trip type'],
         enum: ['created', 'ongoing', 'cancelled', 'finished'],
         default: 'created',
-    }, 
+    },
+    type:{
+        type: String,
+      
+    } 
 },
 {
     timestamps: true,

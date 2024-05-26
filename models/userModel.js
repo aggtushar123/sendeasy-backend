@@ -82,6 +82,14 @@ const userSchema = mongoose.Schema(
       type: String,
       default: ""
     },
+    notification: {
+      type: Array,
+      default: []
+    },
+    seennotification:{
+      type: Array,
+      default:[]
+    }
   },
   {
     timestamps: true,

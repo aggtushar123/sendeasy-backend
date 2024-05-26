@@ -31,20 +31,13 @@ const getLuggageListings = asyncHandler(async (req, res) => {
 // Get /api/travelerListing/:id
 // @access PRIVATE
 const getLuggageListing = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error("User not found");
-  }
-  const luggageListing = await LuggageListing.find(req.params.id);
+ 
+  const luggageListing = await LuggageListing.findById(req.params.id);
   if (!luggageListing) {
     res.status(404);
     throw new Error("Luggage Listing not Found");
   }
-  if (luggageListing.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("Not Authorized");
-  }
+  
   res.status(200).json(luggageListing);
 });
 
@@ -64,6 +57,7 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverNumber,
     receiverLocation,
     note,
+    type
   } = req.body;
   if (
     !travelType ||
@@ -100,6 +94,7 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverNumber,
     receiverLocation,
     note,
+    type,
     user: req.user.id,
   });
 

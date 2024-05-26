@@ -4,6 +4,8 @@ const User = require("../models/userModel");
 const userOtpVerification = require("../models/userOtpVerification");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const Booking = require('../models/bookingModel')
+const TravelerListing = require("../models/travelerListing");
 
 let mainUserId;
 
@@ -274,6 +276,8 @@ const updateUser = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 const loginUser = asyncHandler(async (req, res) => {
   let { email, password } = req.body;
 
@@ -313,6 +317,8 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Password");
   }
 });
+
+
 const deleteUser = async (req, res) => {
   const userId = req.params.userId;
 
@@ -328,6 +334,145 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+const getAllNotifications = async (req, res) => {
+  try {
+    const { userId } = req.query; 
+    
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'UserId is required' });
+    }
+    
+    const user = await User.findOne({ _id: userId });
+   
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    
+    res.status(200).json(
+      user.notification, // Assuming 'notification' should be 'notifications'
+);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+  }
+};
+
+
+const getAllNotification = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.body.userId });
+    const seennotification = user.seennotification;
+    const notification = user.notification;
+    seennotification.push(...notification);
+    user.notification = [];
+    user.seennotification = notification;
+    const updatedUser = await user.save();
+    res.status(200).send({
+      success: true,
+      message: "all notification marked as read",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Error in notification",
+      success: false,
+      error,
+    });
+  }
+};
+const deleteAllNotification = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.body.userId });
+    user.notification = [];
+    user.seennotification = [];
+    const updatedUser = await user.save();
+    res.status(200).send({
+      success: true,
+      message: "Notifications Deleted successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "unable to delete all notifications",
+      error,
+    });
+  }
+};
+const bookNowTraveler = async (req, res) => {
+  try {
+    // Extract data from the request body
+    const { userId, listedId, listingInfo, userInfo } = req.body;
+
+    // Create a new booking with pending status
+    const newBooking = new Booking({
+      userId,
+      listedId,
+      listingInfo,
+      userInfo,
+      status: "pending" // Assuming your Booking model has a 'status' field
+    });
+
+    // Save the new booking to the database
+    await newBooking.save();
+
+    // Find the user associated with the listedId
+    const user = await User.findOne({ _id: listedId });
+    const user2 = await User.findOne({_id: userId})
+ 
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user2) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    // Add a notification to the user
+    if (!user.notification) {
+      user.notification = [];
+    }
+
+    user.notification.push({
+      from: userInfo.fName,
+      message: `New Booking Request from ${userInfo.fName} `,
+      bookingId: newBooking._id
+    });
+
+    if (!user2.notification) {
+      user2.notification = [];
+    }
+
+    user2.notification.push({
+      from: user.fName,
+      message: `Booking Request sent to ${user.fName} `,
+      bookingId: newBooking._id
+    });
+
+    // Save the updated user object
+    const updatedUser = await user.save();
+    const updatedUser2 = await user2.save();
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      message: "Appointment Booked successfully",
+      user: updatedUser,
+      user2: updatedUser2
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Error While Booking Appointment",
+    });
+  }
+};
+
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -343,5 +488,9 @@ module.exports = {
   updateUser,
   getUser,
   deleteUser,
-  getAllUsers
+  getAllUsers,
+  getAllNotification,
+  deleteAllNotification,
+  bookNowTraveler,
+  getAllNotifications,
 };

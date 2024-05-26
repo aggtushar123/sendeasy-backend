@@ -30,20 +30,14 @@ const getTravelerListings = asyncHandler(async (req, res) => {
 // Get /api/travelerListing/:id
 // @access PRIVATE
 const getTravelerListing = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error("User not found");
-  }
-  const travelerListing = await TravelerListing.find(req.params.id);
+ 
+ 
+  const travelerListing = await TravelerListing.findById(req.params.id);
   if (!travelerListing) {
     res.status(404);
     throw new Error("Traveler Listing not Found");
   }
-  if (travelerListing.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("Not Authorized");
-  }
+ 
   res.status(200).json(travelerListing);
 });
 
@@ -59,6 +53,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     timeOfDelivery,
     sourceLocation,
     departure,
+    type,
   } = req.body;
   if (
     !travelType ||
@@ -88,6 +83,7 @@ const createTravelerListing = asyncHandler(async (req, res) => {
     timeOfDelivery,
     sourceLocation,
     departure,
+    type,
     user: req.user.id,
   });
 
