@@ -1,20 +1,20 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const LuggageListing = require("../models/luggageListing");
-
+const cloudinary = require("../utils/cloudinary");
 // Get TravelerListings
 // Get /api/travelerListing
 // @access PRIVATE
 
 const getAllLuggageListings = asyncHandler(async (req, res) => {
-    try {
-        const data = await LuggageListing.find();
-        res.json(data);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-      }
-  });
+  try {
+    const data = await LuggageListing.find();
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 const getLuggageListings = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
@@ -31,13 +31,12 @@ const getLuggageListings = asyncHandler(async (req, res) => {
 // Get /api/travelerListing/:id
 // @access PRIVATE
 const getLuggageListing = asyncHandler(async (req, res) => {
- 
   const luggageListing = await LuggageListing.findById(req.params.id);
   if (!luggageListing) {
     res.status(404);
     throw new Error("Luggage Listing not Found");
   }
-  
+
   res.status(200).json(luggageListing);
 });
 
@@ -57,8 +56,12 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverNumber,
     receiverLocation,
     note,
-    type
+    type,
+    image,
+    image2,
+    expectation,
   } = req.body;
+
   if (
     !travelType ||
     !destinationLocation ||
@@ -70,11 +73,43 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     !nameOfItems ||
     !receiverName ||
     !receiverNumber ||
-    !receiverLocation
+    !receiverLocation ||
+    !image ||
+    !image2 ||
+    !expectation
   ) {
     res.status(400);
     throw new Error("Please add details");
   }
+  const uploadedImage1 = await cloudinary.uploader.upload(
+    image,
+    {
+      upload_preset: "us4q4ppn",
+      public_id: "avatar",
+      allowed_formats: ["png", "jpg", "jpeg", "svg", "ico", "jfif", "webp"],
+    },
+    function (error, result) {
+      if (error) {
+        console.log(error);
+      }
+ 
+    }
+  );
+  const uploadedImage2 = await cloudinary.uploader.upload(
+    image2,
+    {
+      upload_preset: "us4q4ppn",
+      public_id: "avatar",
+      allowed_formats: ["png", "jpg", "jpeg", "svg", "ico", "jfif", "webp"],
+    },
+    function (error, result) {
+      if (error) {
+        console.log(error);
+      }
+      
+    }
+  );
+
   const user = await User.findById(req.user.id);
   if (!user) {
     res.status(401);
@@ -95,6 +130,9 @@ const createLuggageListing = asyncHandler(async (req, res) => {
     receiverLocation,
     note,
     type,
+    image1: uploadedImage1.secure_url,
+    image2: uploadedImage2.secure_url,
+    expectation,
     user: req.user.id,
   });
 
@@ -177,7 +215,7 @@ const updateLuggageTripsStatus = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-    getAllLuggageListings,
+  getAllLuggageListings,
   getLuggageListings,
   getLuggageListing,
   createLuggageListing,
