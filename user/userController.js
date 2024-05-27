@@ -437,6 +437,7 @@ const bookNowTraveler = async (req, res) => {
 
     user.notification.push({
       from: userInfo.fName,
+      profilePicture: user2.profilePicture,
       message: `New Booking Request from ${userInfo.fName} `,
       bookingId: newBooking._id
     });
@@ -447,6 +448,7 @@ const bookNowTraveler = async (req, res) => {
 
     user2.notification.push({
       from: user.fName,
+      profilePicture: user.profilePicture,
       message: `Booking Request sent to ${user.fName} `,
       bookingId: newBooking._id
     });
