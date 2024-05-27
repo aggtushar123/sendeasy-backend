@@ -59,6 +59,19 @@ const luggageListingSchema = mongoose.Schema({
         enum: ['created', 'ongoing', 'cancelled', 'finished'],
         default: 'created',
     },
+    expectation: {
+        type: Number,
+        required: [true],
+        default: 50
+    },
+    image1: {
+        type: String,
+        required: [true]
+    },
+    image2: {
+        type: String,
+        required: [true]
+    },
     type:{
         type: String,
       
