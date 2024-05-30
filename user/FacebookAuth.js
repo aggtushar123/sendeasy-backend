@@ -11,8 +11,8 @@ router.get(
 router.get(
   '/facebook/callback',
   passport.authenticate('facebook', {
-    successRedirect: 'http://localhost:3000/auth/google/success',
-    failureRedirect: '/login/failed',
+    successRedirect: 'http://localhost:3000/auth/facebook/success',
+    failureRedirect: 'http://localhost:3000/signup',
   })
 );
 
@@ -63,9 +63,14 @@ router.get('/login/failed', (req, res) => {
   });
 });
 
-router.get('logout', (req, res) => {
+router.get('/logout', (req, res) => {
   req.logOut();
   res.redirect(process.env.CLIENT_URL);
 });
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 
 module.exports = router;
