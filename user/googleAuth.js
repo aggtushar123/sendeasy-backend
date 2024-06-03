@@ -5,7 +5,6 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -14,7 +13,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     successRedirect: "http://localhost:3000/auth/google/success",
-    failureRedirect: "/login/failed",
+    failureRedirect: "http://localhost:3000/signup",
   })
 );
 
@@ -23,20 +22,31 @@ router.get("/login/success", async (req, res) => {
     try {
       const { email } = req.user;
       const userExists = await User.findOne({ email });
-      if (!userExists) {
+
+      if (userExists) {
+        res.status(200).json({
+          user: userExists,
+        });
+      } else {
+        
         const user = await new User({
           email: req.user.email,
           fName: req.user.displayName,
-          token: generateToken(req.user.id),
           verified: true,
           isAdmin: false,
           profilePicture: req.user.picture,
         });
-        const createdUser = await user.save();
-        
-        res.status(200).json({
-          user: createdUser,
-        });
+        const savedUser = await user.save();
+
+        // Generate a token for the new user
+        const token = generateToken(savedUser._id);
+
+        // Update the user with the generated token
+        savedUser.token = token;
+        const updatedUser = await savedUser.save();
+
+        // Send the updated user to the frontend
+        res.status(200).json(updatedUser);
       }
     } catch (error) {
       console.log("Error in login/success route:", error);
@@ -54,7 +64,7 @@ router.get("/login/failed", (req, res) => {
   });
 });
 
-router.get("logout", (req, res) => {
+router.get("/logout", (req, res) => {
   req.logOut();
   res.redirect(process.env.CLIENT_URL);
 });
